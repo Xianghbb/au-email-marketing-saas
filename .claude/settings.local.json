@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__memory__search_nodes",
+      "mcp__memory__read_graph",
+      "Bash(git fetch:*)",
+      "Bash(pwsh:*)",
+      "mcp__github_github-mcp-server__get_me",
+      "mcp__github_github-mcp-server__search_repositories",
+      "mcp__github_github-mcp-server__create_repository",
+      "Bash(git remote add origin https://github.com/Xianghbb/au-email-marketing-saas.git)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

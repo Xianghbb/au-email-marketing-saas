@@ -31,7 +31,47 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### AI Email Marketing SaaS Compliance Gates
+
+**Tech Stack Compliance (Principle I)**
+- [ ] Uses Next.js 14+ with App Router
+- [ ] TypeScript with strict mode enabled
+- [ ] Supabase for database operations
+- [ ] Drizzle ORM for schema management
+- [ ] Clerk with Organizations for multi-tenancy
+- [ ] Inngest for async workflows
+- [ ] AWS SES or Resend for email delivery
+- [ ] OpenAI gpt-4o-mini for AI generation
+
+**Architecture Compliance (Principle II)**
+- [ ] No synchronous batch processing >3 items
+- [ ] Inngest queues implemented for long operations
+- [ ] AI generation uses async workflows
+- [ ] Email sending uses async workflows
+
+**Schema Compliance (Principle III)**
+- [ ] Database changes use Drizzle migrations
+- [ ] Schema is single source of truth
+- [ ] Type safety enforced throughout
+
+**Security Compliance (Principle IV)**
+- [ ] All queries filtered by organization_id
+- [ ] No cross-tenant data access
+- [ ] Tenant isolation verified
+
+**Email Compliance (Principle V)**
+- [ ] All emails include unsubscribe links
+- [ ] Links are signed and tenant-scoped
+- [ ] Suppression list handling implemented
+
+**Scope Compliance (Principle VI)**
+- [ ] Feature aligns with V1 scope (Campaigns, Business DB, Reporting)
+- [ ] No out-of-scope features introduced
+
+**Type Safety (Principle VII)**
+- [ ] No `any` types without justification
+- [ ] Strict TypeScript mode enabled
+- [ ] All entities properly typed
 
 ## Project Structure
 
