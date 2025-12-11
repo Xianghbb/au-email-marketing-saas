@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth/api';
+import { auth } from '@clerk/nextjs/server';
 import { campaignService } from '@/lib/services/campaign';
 import { quotaService } from '@/lib/services/quota';
 import { inngest } from '@/lib/inngest/client';
@@ -9,8 +9,19 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Require authentication
-    const auth = await requireAuth(request);
+    // Get auth context directly
+    const session = await auth();
+
+    if (!session?.userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Handle missing orgId - use userId as fallback
+    const effectiveOrgId = session.orgId || session.userId || 'personal-workspace';
+
     const campaignId = parseInt(params.id);
 
     if (isNaN(campaignId)) {
@@ -22,7 +33,7 @@ export async function POST(
 
     // Get campaign
     const campaign = await campaignService.getCampaign(
-      auth.organizationId,
+      effectiveOrgId,
       campaignId
     );
 
@@ -43,7 +54,7 @@ export async function POST(
 
     // Check quota for sending
     const quotaCheck = await quotaService.checkQuota(
-      auth.organizationId,
+      effectiveOrgId,
       campaign.totalRecipients
     );
 
@@ -63,13 +74,13 @@ export async function POST(
       name: 'campaign/send-batch',
       data: {
         campaignId,
-        organizationId: auth.organizationId,
+        organizationId: effectiveOrgId,
       },
     });
 
     // Update campaign status to 'sending'
     await campaignService.updateCampaignStatus(
-      auth.organizationId,
+      effectiveOrgId,
       campaignId,
       'sending'
     );

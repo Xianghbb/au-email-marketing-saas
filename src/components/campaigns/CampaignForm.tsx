@@ -151,7 +151,7 @@ export function CampaignForm({ onSubmit, isLoading = false }: CampaignFormProps)
                     <SelectValue placeholder="Select the tone for your emails" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-gray-900">
                   {EMAIL_TONES.map((tone) => (
                     <SelectItem key={tone.value} value={tone.value}>
                       {tone.label}

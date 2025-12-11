@@ -40,7 +40,8 @@
       "Bash(curl:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npx tsx:*)"
     ],
     "deny": [],
     "ask": []

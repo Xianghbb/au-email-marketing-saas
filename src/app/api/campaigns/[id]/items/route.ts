@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth/api';
+import { auth } from '@clerk/nextjs/server';
 import { campaignService } from '@/lib/services/campaign';
 import { db } from '@/lib/db';
-import { campaignItems, businesses } from '@/lib/db/schema';
+import { campaignItems, businesses, campaigns } from '@/lib/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { withOrganization } from '@/lib/db/tenant';
 
@@ -11,9 +11,24 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Require authentication
-    const auth = await requireAuth(request);
-    const campaignId = parseInt(params.id);
+    // Get auth context directly
+    const session = await auth();
+
+    if (!session?.userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Handle missing orgId - use userId as fallback
+    const effectiveOrgId = session.orgId || session.userId || 'personal-workspace';
+    console.log('[CAMPAIGN ITEMS] Effective org ID:', effectiveOrgId);
+    console.log('[CAMPAIGN ITEMS] User ID:', session.userId);
+    console.log('[CAMPAIGN ITEMS] Session org ID:', session.orgId);
+
+    const campaignId = parseInt(params.id, 10);
+    console.log('[CAMPAIGN ITEMS] Campaign ID:', campaignId);
 
     if (isNaN(campaignId)) {
       return NextResponse.json(
@@ -36,10 +51,11 @@ export async function GET(
       })
       .from(campaignItems)
       .innerJoin(businesses, eq(businesses.id, campaignItems.businessId))
+      .innerJoin(campaigns, eq(campaigns.id, campaignItems.campaignId))
       .where(
         and(
           eq(campaignItems.campaignId, campaignId),
-          withOrganization(auth.organizationId)
+          eq(campaigns.organizationId, effectiveOrgId)
         )
       )
       .orderBy(businesses.name);
@@ -58,25 +74,21 @@ export async function GET(
 
     return NextResponse.json(transformedItems);
   } catch (error) {
-    console.error('Error fetching campaign items:', error);
+    console.error('ITEMS API ERROR:', error);
+    console.error('Error type:', error?.constructor?.name);
+    console.error('Error message:', (error as Error).message);
+    console.error('Error stack:', (error as Error).stack);
+    console.error('Request params:', params);
 
-    if (error instanceof Error) {
-      if (error.message === 'Unauthorized') {
-        return NextResponse.json(
-          { error: 'Authentication required' },
-          { status: 401 }
-        );
-      }
-      if (error.message === 'No organization selected') {
-        return NextResponse.json(
-          { error: 'Organization required' },
-          { status: 403 }
-        );
-      }
+    // Log session info if available
+    try {
+      console.error('Session info in error handler');
+    } catch (e) {
+      console.error('Failed to log session info');
     }
 
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: (error as Error).message },
       { status: 500 }
     );
   }

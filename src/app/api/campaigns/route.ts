@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth/api';
+import { auth } from '@clerk/nextjs/server';
 import { campaignService } from '@/lib/services/campaign';
 import { inngest } from '@/lib/inngest/client';
 import { z } from 'zod';
@@ -14,8 +14,18 @@ const createCampaignSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    // Require authentication
-    const auth = await requireAuth(request);
+    // Get auth context directly
+    const session = await auth();
+
+    if (!session?.userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Handle missing orgId - use userId as fallback
+    const effectiveOrgId = session.orgId || session.userId || 'personal-workspace';
 
     // Get query parameters
     const searchParams = request.nextUrl.searchParams;
@@ -32,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     // Get campaigns for organization
     const results = await campaignService.getCampaigns(
-      auth.organizationId,
+      effectiveOrgId,
       page,
       limit
     );
@@ -47,21 +57,6 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching campaigns:', error);
 
-    if (error instanceof Error) {
-      if (error.message === 'Unauthorized') {
-        return NextResponse.json(
-          { error: 'Authentication required' },
-          { status: 401 }
-        );
-      }
-      if (error.message === 'No organization selected') {
-        return NextResponse.json(
-          { error: 'Organization required' },
-          { status: 403 }
-        );
-      }
-    }
-
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -71,14 +66,28 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Require authentication
-    const auth = await requireAuth(request);
+    // Get auth context directly
+    const session = await auth();
+
+    if (!session?.userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Handle missing orgId - use userId as fallback
+    const effectiveOrgId = session.orgId || session.userId || 'personal-workspace';
+    console.log('Using effective org ID:', effectiveOrgId);
 
     // Parse and validate request body
     const body = await request.json();
+    console.log('Campaign creation request body:', JSON.stringify(body, null, 2));
+
     const validation = createCampaignSchema.safeParse(body);
 
     if (!validation.success) {
+      console.error('Campaign validation failed:', validation.error.format());
       return NextResponse.json(
         {
           error: 'Invalid request data',
@@ -89,30 +98,23 @@ export async function POST(request: NextRequest) {
     }
 
     const data = validation.data;
+    console.log('Validated campaign data:', JSON.stringify(data, null, 2));
 
     // Create campaign
     const campaign = await campaignService.createCampaign(
-      auth.organizationId,
+      effectiveOrgId,
       data
     );
 
+    console.log('Campaign created successfully:', JSON.stringify(campaign, null, 2));
     return NextResponse.json(campaign, { status: 201 });
   } catch (error) {
-    console.error('Error creating campaign:', error);
+    console.error('Campaign Create Error:', error);
+    console.error('Error type:', error?.constructor?.name);
+    console.error('Error message:', (error as Error).message);
+    console.error('Error stack:', (error as Error).stack);
 
     if (error instanceof Error) {
-      if (error.message === 'Unauthorized') {
-        return NextResponse.json(
-          { error: 'Authentication required' },
-          { status: 401 }
-        );
-      }
-      if (error.message === 'No organization selected') {
-        return NextResponse.json(
-          { error: 'Organization required' },
-          { status: 403 }
-        );
-      }
       if (error.message === 'Some business IDs are invalid') {
         return NextResponse.json(
           { error: 'Invalid business IDs provided' },

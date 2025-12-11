@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth/api';
+import { auth } from '@clerk/nextjs/server';
 import { campaignService } from '@/lib/services/campaign';
 
 export async function GET(
@@ -7,8 +7,19 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Require authentication
-    const auth = await requireAuth(request);
+    // Get auth context directly
+    const session = await auth();
+
+    if (!session?.userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Handle missing orgId - use userId as fallback
+    const effectiveOrgId = session.orgId || session.userId || 'personal-workspace';
+
     const campaignId = parseInt(params.id);
 
     if (isNaN(campaignId)) {
@@ -20,7 +31,7 @@ export async function GET(
 
     // Get campaign
     const campaign = await campaignService.getCampaign(
-      auth.organizationId,
+      effectiveOrgId,
       campaignId
     );
 
@@ -33,7 +44,7 @@ export async function GET(
 
     // Get metrics
     const metrics = await campaignService.getCampaignMetrics(
-      auth.organizationId,
+      effectiveOrgId,
       campaignId
     );
 

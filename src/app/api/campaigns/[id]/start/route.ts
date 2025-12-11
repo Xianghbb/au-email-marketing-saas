@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth/api';
+import { auth } from '@clerk/nextjs/server';
 import { campaignService } from '@/lib/services/campaign';
 import { quotaService } from '@/lib/services/quota';
 import { inngest } from '@/lib/inngest/client';
@@ -15,9 +15,24 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Require authentication
-    const auth = await requireAuth(request);
-    const campaignId = parseInt(params.id);
+    // Get auth context directly
+    const session = await auth();
+
+    if (!session?.userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Handle missing orgId - use userId as fallback
+    const effectiveOrgId = session.orgId || session.userId || 'personal-workspace';
+    console.log('[CAMPAIGN START] Effective org ID:', effectiveOrgId);
+    console.log('[CAMPAIGN START] User ID:', session.userId);
+    console.log('[CAMPAIGN START] Session org ID:', session.orgId);
+
+    const campaignId = parseInt(params.id, 10);
+    console.log('[CAMPAIGN START] Campaign ID:', campaignId);
 
     if (isNaN(campaignId)) {
       return NextResponse.json(
@@ -26,8 +41,19 @@ export async function POST(
       );
     }
 
+    // Safely parse request body (handle empty bodies)
+    let body = {};
+    try {
+      const text = await request.text();
+      if (text) {
+        body = JSON.parse(text);
+      }
+    } catch (e) {
+      // Body is optional/empty, ignore JSON parse errors
+      console.log('[CAMPAIGN START] No JSON body provided, using defaults');
+    }
+
     // Parse and validate request body
-    const body = await request.json();
     const validation = startCampaignSchema.safeParse(body);
 
     if (!validation.success) {
@@ -44,7 +70,7 @@ export async function POST(
 
     // Get campaign
     const campaign = await campaignService.getCampaign(
-      auth.organizationId,
+      effectiveOrgId,
       campaignId
     );
 
@@ -73,7 +99,7 @@ export async function POST(
     // Check quota for sending
     if (action === 'send') {
       const quotaCheck = await quotaService.checkQuota(
-        auth.organizationId,
+        effectiveOrgId,
         campaign.totalRecipients
       );
 
@@ -98,14 +124,14 @@ export async function POST(
       name: eventName,
       data: {
         campaignId,
-        organizationId: auth.organizationId,
+        organizationId: effectiveOrgId,
       },
     });
 
     // Update campaign status
     const newStatus = action === 'generate' ? 'generating' : 'sending';
     await campaignService.updateCampaignStatus(
-      auth.organizationId,
+      effectiveOrgId,
       campaignId,
       newStatus
     );
@@ -116,25 +142,14 @@ export async function POST(
       campaignId,
     });
   } catch (error) {
-    console.error('Error starting campaign:', error);
-
-    if (error instanceof Error) {
-      if (error.message === 'Unauthorized') {
-        return NextResponse.json(
-          { error: 'Authentication required' },
-          { status: 401 }
-        );
-      }
-      if (error.message === 'No organization selected') {
-        return NextResponse.json(
-          { error: 'Organization required' },
-          { status: 403 }
-        );
-      }
-    }
+    console.error('START API ERROR:', error);
+    console.error('Error type:', error?.constructor?.name);
+    console.error('Error message:', (error as Error).message);
+    console.error('Error stack:', (error as Error).stack);
+    console.error('Request params:', params);
 
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: (error as Error).message },
       { status: 500 }
     );
   }
@@ -145,9 +160,22 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Require authentication
-    const auth = await requireAuth(request);
+    // Get auth context directly
+    const session = await auth();
+
+    if (!session?.userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Handle missing orgId - use userId as fallback
+    const effectiveOrgId = session.orgId || session.userId || 'personal-workspace';
+    console.log('[CAMPAIGN START GET] Effective org ID:', effectiveOrgId);
+
     const campaignId = parseInt(params.id);
+    console.log('[CAMPAIGN START GET] Campaign ID:', campaignId);
 
     if (isNaN(campaignId)) {
       return NextResponse.json(
@@ -158,7 +186,7 @@ export async function GET(
 
     // Get campaign with details
     const campaign = await campaignService.getCampaignWithDetails(
-      auth.organizationId,
+      effectiveOrgId,
       campaignId
     );
 

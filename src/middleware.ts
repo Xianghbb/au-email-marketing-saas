@@ -2,10 +2,8 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
-  '/api/campaigns(.*)',
-  '/api/analytics(.*)',
-  '/api/quota(.*)',
-  // Note: /api/businesses is intentionally left unprotected for development testing
+  // API routes are now handled directly in the route handlers with fallback logic
+  // to support users without organizations
 ])
 
 export default clerkMiddleware(async (auth, req) => {
