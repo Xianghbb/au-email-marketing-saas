@@ -49,7 +49,13 @@
       "mcp__vercel__get_deployment_build_logs",
       "mcp__vercel__list_teams",
       "mcp__vercel__list_projects",
-      "mcp__vercel__list_deployments"
+      "mcp__vercel__list_deployments",
+      "Bash(vercel list:*)",
+      "Bash(vercel logs https://aiemailplatform-fwos5cbsw-hongbing-xiangs-projects.vercel.app --limit 50)",
+      "Bash(vercel logs:*)",
+      "Bash(vercel inspect:*)",
+      "Bash(vercel project ls:*)",
+      "Bash(vercel project add:*)"
     ],
     "deny": [],
     "ask": []
