@@ -110,8 +110,7 @@ export const sendCampaignBatch = inngest.createFunction(
             eq(campaignItems.status, 'generated')
           )
         )
-        .limit(10)
-        .forUpdate();
+        .limit(10);
     });
 
     if (emails.length === 0) {
@@ -135,17 +134,17 @@ export const sendCampaignBatch = inngest.createFunction(
       return { sent: 0, complete: true };
     }
 
-    // Check suppression list
-    const suppressed = await step.run('check-suppression', async () => {
+    // Check suppression list and prepare emails for sending
+    const emailsToSend = await step.run('check-suppression-and-prepare', async () => {
       const emailAddresses = emails.map(e => e.businessEmail);
-      return suppressionService.getSuppressedEmails(organizationId, emailAddresses);
-    });
+      const suppressed = await suppressionService.getSuppressedEmails(organizationId, emailAddresses);
+      const suppressedSet = new Set(suppressed);
 
-    // Prepare emails for sending
-    const emailsToSend = emails.map(email => ({
-      ...email,
-      isSuppressed: suppressed.has(email.businessEmail),
-    }));
+      return emails.map(email => ({
+        ...email,
+        isSuppressed: suppressedSet.has(email.businessEmail),
+      }));
+    });
 
     // Send emails with rate limiting
     const results = await step.run('send-emails', async () => {
@@ -169,7 +168,7 @@ export const sendCampaignBatch = inngest.createFunction(
           // Add unsubscribe link to email
           const unsubscribeUrl = `${process.env.APP_URL}/unsubscribe/${unsubscribeToken}`;
           const emailContent = emailService.addUnsubscribeToEmail(
-            email.emailContent,
+            email.emailContent || '',
             unsubscribeUrl
           );
 
@@ -177,7 +176,7 @@ export const sendCampaignBatch = inngest.createFunction(
           const result = await emailService.sendEmail({
             from: `${campaign.senderName} <${campaign.senderEmail}>`,
             to: email.businessEmail,
-            subject: email.emailSubject,
+            subject: email.emailSubject || 'No Subject',
             html: emailContent,
             tags: [
               { name: 'campaign', value: campaign.id.toString() },

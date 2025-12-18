@@ -51,7 +51,7 @@ const formSchema = z.object({
       message: 'Service description must be less than 500 characters.',
     }),
   emailTone: z.string({
-    required_error: 'Please select an email tone.',
+    message: 'Please select an email tone.',
   }),
 });
 

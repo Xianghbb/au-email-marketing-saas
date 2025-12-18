@@ -452,7 +452,7 @@ export default function CampaignDetailPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={(e) => handleCopyToClipboard(e, item.emailContent || '', item.id)}
+                          onClick={() => handleCopyToClipboard(item.emailContent || '', item.id)}
                         >
                           {copiedItemId === item.id ? 'Copied!' : 'Copy to Clipboard'}
                         </Button>

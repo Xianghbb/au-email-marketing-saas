@@ -4,6 +4,8 @@ import { campaignService } from '@/lib/services/campaign';
 import { inngest } from '@/lib/inngest/client';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 // Campaign creation schema
 const createCampaignSchema = z.object({
   name: z.string().min(1).max(255),

@@ -4,7 +4,6 @@ import { NextRequest } from 'next/server';
 interface AuthContext {
   userId: string;
   organizationId: string;
-  user: any;
 }
 
 export async function requireAuth(req: NextRequest): Promise<AuthContext> {
@@ -21,7 +20,6 @@ export async function requireAuth(req: NextRequest): Promise<AuthContext> {
   return {
     userId: session.userId,
     organizationId: session.orgId,
-    user: session.user,
   };
 }
 

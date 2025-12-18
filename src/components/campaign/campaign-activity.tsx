@@ -47,9 +47,9 @@ export default function CampaignActivity({ campaignId }: CampaignActivityProps) 
       case 'delivered':
         return 'default';
       case 'opened':
-        return 'success';
+        return 'default';
       case 'clicked':
-        return 'success';
+        return 'default';
       case 'bounced':
         return 'destructive';
       case 'complained':

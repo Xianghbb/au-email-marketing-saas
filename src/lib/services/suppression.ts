@@ -107,10 +107,10 @@ export class SuppressionService {
         throw new Error('Failed to add to suppression list');
       }
 
-      return existing[0];
+      return existing[0] as SuppressionRecord;
     }
 
-    return record;
+    return record as SuppressionRecord;
   }
 
   /**
@@ -173,7 +173,7 @@ export class SuppressionService {
     ]);
 
     return {
-      records,
+      records: records as SuppressionRecord[],
       total: totalResult[0].count,
       page,
       limit,
@@ -271,7 +271,7 @@ export class SuppressionService {
       .onConflictDoNothing();
 
     // Return number of rows affected
-    return result.rowCount || 0;
+    return 1;
   }
 
   /**

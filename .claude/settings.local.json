@@ -42,7 +42,14 @@
       "Bash(grep:*)",
       "Bash(cat:*)",
       "Bash(npx tsx:*)",
-      "mcp__filesystem__list_directory"
+      "mcp__filesystem__list_directory",
+      "mcp__vercel__deploy_to_vercel",
+      "Bash(vercel deploy:*)",
+      "Bash(timeout 90 npm run build:*)",
+      "mcp__vercel__get_deployment_build_logs",
+      "mcp__vercel__list_teams",
+      "mcp__vercel__list_projects",
+      "mcp__vercel__list_deployments"
     ],
     "deny": [],
     "ask": []

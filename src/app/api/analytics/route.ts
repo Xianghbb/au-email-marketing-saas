@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import { campaigns, campaignItems, emailEvents } from '@/lib/db/schema';
 import { eq, and, gte, lte, desc, inArray } from 'drizzle-orm';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

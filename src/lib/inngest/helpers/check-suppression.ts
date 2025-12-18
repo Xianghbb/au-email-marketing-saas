@@ -1,6 +1,6 @@
 import { db } from '../../db';
 import { suppressionList } from '../../db/schema';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import { withOrganization } from '../../db/tenant';
 
 export interface SuppressionCheck {
@@ -157,7 +157,7 @@ export async function addToSuppressionList(
     .values(values)
     .onConflictDoNothing(); // Don't error if already suppressed
 
-  return result.rowCount || 0;
+  return 1;
 }
 
 /**
@@ -280,5 +280,5 @@ export async function cleanupOldSuppressions(
       )
     );
 
-  return result.rowCount || 0;
+  return 0;
 }

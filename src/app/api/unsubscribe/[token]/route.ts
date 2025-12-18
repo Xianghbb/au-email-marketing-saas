@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { suppressionList } from '@/lib/db/schema';
+import { eq, and } from 'drizzle-orm';
 import { jwtUtils } from '@/lib/auth/jwt';
 import { createUnsubscribePage } from '@/lib/email/templates/unsubscribe';
 
@@ -33,10 +34,12 @@ export async function GET(
         email: suppressionList.email,
       })
       .from(suppressionList)
-      .where({
-        organizationId,
-        id: campaignItemId,
-      })
+      .where(
+        and(
+          eq(suppressionList.organizationId, organizationId),
+          eq(suppressionList.id, campaignItemId)
+        )
+      )
       .limit(1);
 
     // Add email to suppression list if not already there

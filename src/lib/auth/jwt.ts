@@ -97,10 +97,6 @@ export function verifyTrackingToken(token: string): {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as EmailTrackingTokenPayload;
 
-    if (decoded.type !== 'tracking') {
-      return { valid: false, error: 'Invalid token type' };
-    }
-
     return {
       valid: true,
       data: decoded,
@@ -175,7 +171,9 @@ export const TokenTypes = {
 export const jwtUtils = {
   generateUnsubscribeToken,
   verifyUnsubscribeToken,
-  generateEmailTrackingToken,
-  verifyEmailTrackingToken,
+  generateTrackingToken,
+  verifyTrackingToken,
+  generateTrackingPixelUrl,
+  generateTrackingLinkUrl,
   TokenTypes
 };

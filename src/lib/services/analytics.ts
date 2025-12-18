@@ -141,13 +141,13 @@ export class AnalyticsService {
     // Get quota information
     const quotaResult = await db
       .select()
-      .from(organization_quotas)
+      .from(organizationQuotas)
       .where(withOrganization(organizationId))
       .limit(1);
 
     const quota = quotaResult[0];
     const quotaLimit = quota?.monthlyQuota || 1000;
-    const quotaUsage = quota?.emailsSentThisMonth || 0;
+    const quotaUsage = quota?.monthlyUsed || 0;
 
     return {
       totalCampaigns: campaignCount[0].count,

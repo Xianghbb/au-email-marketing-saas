@@ -1,7 +1,7 @@
 import { inngest } from '../client';
 import { db } from '../../db';
 import { campaigns, campaignItems, businesses } from '../../db/schema';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, sql, count } from 'drizzle-orm';
 import { withOrganization } from '../../db/tenant';
 import OpenAI from 'openai';
 
@@ -219,11 +219,14 @@ export const batchGenerateEmails = inngest.createFunction(
             })
             .where(eq(campaignItems.id, result.value.itemId));
         } else {
+          const errorMsg = result.status === 'fulfilled'
+            ? (result.value.error || 'Generation failed')
+            : (result.reason?.error || 'Generation failed');
           return db
             .update(campaignItems)
             .set({
               status: 'failed',
-              errorMessage: result.value?.error || 'Generation failed',
+              errorMessage: errorMsg,
               updatedAt: new Date(),
             })
             .where(eq(campaignItems.id, item.itemId));

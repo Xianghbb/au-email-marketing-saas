@@ -1,4 +1,5 @@
-import { pgTable, serial, varchar, text, integer, timestamp, boolean, jsonb, index, unique, eq, and, count, inArray } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, text, integer, timestamp, boolean, jsonb, index, unique } from 'drizzle-orm/pg-core';
+import { eq, and, count, inArray } from 'drizzle-orm';
 
 // Global businesses table (no tenant isolation)
 export const businesses = pgTable('businesses', {
