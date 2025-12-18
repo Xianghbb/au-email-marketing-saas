@@ -55,7 +55,8 @@
       "Bash(vercel logs:*)",
       "Bash(vercel inspect:*)",
       "Bash(vercel project ls:*)",
-      "Bash(vercel project add:*)"
+      "Bash(vercel project add:*)",
+      "mcp__filesystem__create_directory"
     ],
     "deny": [],
     "ask": []
