@@ -49,7 +49,7 @@ export default function Sidebar() {
     <div className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col fixed left-0 top-0">
       {/* Logo/Brand */}
       <div className="p-6 border-b border-gray-200">
-        <Link href="/dashboard" className="flex items-center space-x-2">
+        <Link href="/overview" className="flex items-center space-x-2">
           <Mail className="h-6 w-6 text-blue-600" />
           <span className="text-xl font-bold text-gray-900">B2B Email Platform</span>
         </Link>

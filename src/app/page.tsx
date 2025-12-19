@@ -32,14 +32,9 @@ export default function HomePage() {
 
           <SignedIn>
             <div className="flex gap-4 justify-center">
-              <Link href="/businesses">
+              <Link href="/overview">
                 <Button size="lg" className="text-lg px-8">
-                  Find Business Leads
-                </Button>
-              </Link>
-              <Link href="/campaigns">
-                <Button size="lg" variant="outline" className="text-lg px-8">
-                  View Campaigns
+                  Go to Dashboard
                 </Button>
               </Link>
             </div>
