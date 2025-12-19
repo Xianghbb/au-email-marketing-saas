@@ -1,3 +1,5 @@
+import OverviewCalendar from '@/components/dashboard/OverviewCalendar';
+
 export default function OverviewPage() {
   return (
     <div className="space-y-8">
@@ -11,27 +13,37 @@ export default function OverviewPage() {
         </p>
       </div>
 
-      {/* Feature Cards */}
-      <div className="grid md:grid-cols-3 gap-6 mt-12">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-xl font-semibold mb-3 text-gray-900">Targeted Search</h3>
-          <p className="text-gray-600">
-            Filter businesses by city, industry, and more to find your ideal prospects
-          </p>
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column - Calendar */}
+        <div className="lg:col-span-4">
+          <OverviewCalendar />
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-xl font-semibold mb-3 text-gray-900">AI-Powered Emails</h3>
-          <p className="text-gray-600">
-            Generate personalized emails for each prospect using advanced AI technology
-          </p>
-        </div>
+        {/* Right Column - Feature Cards */}
+        <div className="lg:col-span-8">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">Targeted Search</h3>
+              <p className="text-gray-600">
+                Filter businesses by city, industry, and more to find your ideal prospects
+              </p>
+            </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 className="text-xl font-semibold mb-3 text-gray-900">Track Results</h3>
-          <p className="text-gray-600">
-            Monitor open rates, clicks, and responses to optimize your campaigns
-          </p>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">AI-Powered Emails</h3>
+              <p className="text-gray-600">
+                Generate personalized emails for each prospect using advanced AI technology
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">Track Results</h3>
+              <p className="text-gray-600">
+                Monitor open rates, clicks, and responses to optimize your campaigns
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
