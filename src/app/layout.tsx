@@ -14,7 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider afterSignOutUrl="/">
+    <ClerkProvider
+      afterSignOutUrl="/"
+      afterSignInUrl="/overview"
+      afterSignUpUrl="/overview"
+    >
       <QueryProvider>
         <html lang="en">
           <body className="antialiased">
