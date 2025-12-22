@@ -56,7 +56,10 @@
       "Bash(vercel inspect:*)",
       "Bash(vercel project ls:*)",
       "Bash(vercel project add:*)",
-      "mcp__filesystem__create_directory"
+      "mcp__filesystem__create_directory",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__execute_sql",
+      "Bash(timeout 60 npx next build:*)"
     ],
     "deny": [],
     "ask": []
