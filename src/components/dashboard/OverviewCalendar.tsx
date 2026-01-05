@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -17,24 +16,22 @@ export default function OverviewCalendar() {
         <Calendar
           value={value}
           onChange={setValue}
-          showNeighboringMonth={false}
+          showNeighboringMonth={true}
+          locale="en-GB"
+          calendarType="iso8601"
           tileClassName={({ date, view }) => {
             if (view === 'month') {
               // Highlight today
-              const isToday = 
+              const isToday =
                 date.getDate() === new Date().getDate() &&
                 date.getMonth() === new Date().getMonth() &&
                 date.getFullYear() === new Date().getFullYear();
-              
+
               if (isToday) {
                 return 'react-calendar__tile--active';
               }
             }
             return '';
-          }}
-          formatShortWeekday={(locale, date) => {
-            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            return days[date.getDay()];
           }}
         />
       </div>
