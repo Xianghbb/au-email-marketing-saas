@@ -18,9 +18,7 @@ export default function OverviewCalendar() {
           value={value}
           onChange={setValue}
           showNeighboringMonth={false}
-          onClickWeekNumber={(weekNumber, date, event) => {
-            // Handle week number click if needed
-          }}
+          locale="en-GB"
           tileClassName={({ date, view }) => {
             if (view === 'month') {
               // Highlight today
@@ -34,10 +32,6 @@ export default function OverviewCalendar() {
               }
             }
             return '';
-          }}
-          formatShortWeekday={(locale, date) => {
-            const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            return weekdays[date.getDay()];
           }}
         />
       </div>
