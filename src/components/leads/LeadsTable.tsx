@@ -210,13 +210,14 @@ export default function LeadsTable({ leads, activeFilters = [] }: LeadsTableProp
           defaultColDef={defaultColDef}
           onGridReady={onGridReady}
           onSelectionChanged={onSelectionChanged}
-          rowSelection="multiple"
-          suppressRowClickSelection={true}
+          rowSelection={{
+            mode: 'multiRow',
+            headerCheckbox: true,
+            checkboxes: true,
+            enableClickSelection: false
+          }}
           animateRows={true}
-          pagination={true}
-          paginationPageSize={100}
-          enableRangeSelection={true}
-          rowMultiSelectWithClick={false}
+          pagination={false}
           suppressAggFuncInHeader={true}
           enableCellTextSelection={true}
           ensureDomOrder={true}
