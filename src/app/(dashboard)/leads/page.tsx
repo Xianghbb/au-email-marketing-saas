@@ -1,39 +1,41 @@
-import { getSupabaseClient } from '@/lib/db/supabase';
+import { getCompanyDbClient } from '@/lib/db/company-client';
 import LeadsFilters from '@/components/leads/LeadsFilters';
 import LeadsTable from '@/components/leads/LeadsTable';
 
 interface Company {
-  id: string;
-  name: string;
-  categories: string | null;
+  listing_id: string;
+  company_name: string;
+  category_name: string | null;
   email: string | null;
-  phone: string | null;
-  address: string | null;
+  phone_number: string | null;
+  address_suburb: string | null;
+  address_state: string | null;
+  address_postcode: string | null;
 }
 
 async function getLeads(searchQuery?: string, cityQuery?: string, industryQuery?: string): Promise<Company[]> {
-  const supabase = getSupabaseClient();
+  const supabase = getCompanyDbClient();
 
   // Force no cache on the query
   let query = supabase
-    .from('companyinfo')
-    .select('id, name, categories, email, phone, address');
+    .from('rawdata_yellowpage_new')
+    .select('listing_id, company_name, category_name, email, phone_number, address_suburb, address_state, address_postcode');
 
-  // Apply search query filter (name)
+  // Apply search query filter (company_name)
   if (searchQuery && searchQuery.trim()) {
     const searchTerm = `%${searchQuery.trim()}%`;
-    query = query.ilike('name', searchTerm);
+    query = query.ilike('company_name', searchTerm);
   }
 
-  // Apply city filter (search in address)
+  // Apply city filter (search in address_suburb)
   if (cityQuery && cityQuery.trim()) {
     const cityTerm = `%${cityQuery.trim()}%`;
-    query = query.ilike('address', cityTerm);
+    query = query.ilike('address_suburb', cityTerm);
   }
 
-  // Apply industry filter (exact match on categories)
+  // Apply industry filter (exact match on category_name)
   if (industryQuery && industryQuery.trim() && industryQuery !== 'all') {
-    query = query.eq('categories', industryQuery.trim());
+    query = query.eq('category_name', industryQuery.trim());
   }
 
   const { data, error } = await query;
